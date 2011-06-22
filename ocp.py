@@ -8,7 +8,8 @@
 #          ocp will line up all your code where possible with the goal
 #          to make your code as visually pleasing at it deserves to be.
 
-# TODO: Make comments line up.
+# TODO: Make the keywords assignable by the user, so that they can use
+#       this script on any type of text file.
 
 # BUG: Assignment operators of different nest length will line up.
 
@@ -16,8 +17,8 @@
 # BUG FORESEEN: Alignments throwing lines over the char limit.
 
 # syshelp is available in my python-libs repo.
-from syshelp import get_args as _get_args
-from functools import reduce as _reduce
+from syshelp   import get_args as _get_args
+from functools import reduce   as _reduce
 
 def get_lines(filename):
     '''Gets all lines from the file.'''
@@ -34,14 +35,14 @@ def fix_by(key, lines):
         elif block:
             if len(block) > 1:
                 lines = process_block(key, block, lines)
-            block = []  # Reset the block of lines.
+            block     = []  # Reset the block of lines.
     if block and len(block) > 1:
         lines = process_block(key, block, lines)  # Catch stragglers.
     return lines
 
 def process_block(key, block, lines):
     '''Handles the process of a block of lines.'''
-    block = align_by_key(key, block)  # Edit lines to align by key.
+    block = align_by_key(key, block)    # Edit lines to align by key.
     return replace_lines(block, lines)  # Replace the original lines.
     
 def align_by_key(key, block):
@@ -50,11 +51,11 @@ def align_by_key(key, block):
     TODO: Holy crap make this prettier.
     '''
     line_tokens = [line.split(key, 1) for pos, line in block]
-    firsts = list(map(lambda tokens: tokens[0].rstrip(), line_tokens))
+    firsts      = list(map(lambda tokens: tokens[0].rstrip(), line_tokens))
     # Is there a way to do a Haskell-like 'let' in a Python lambda?
     longest = _reduce(lambda ac, i: len(i) if len(i) > ac else ac, firsts, 0)
     for pos, line in enumerate(line_tokens):
-        start = firsts[pos] + (' ' * (longest - len(firsts[pos])))
+        start            = firsts[pos] + (' ' * (longest - len(firsts[pos])))
         line_tokens[pos] = ''.join((start, key, line[1].lstrip()))
     for pos, line in enumerate(block):
         block[pos] = (block[pos][0], line_tokens[pos])
