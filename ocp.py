@@ -8,10 +8,12 @@
 #          ocp will line up all your code where possible with the goal
 #          to make your code as visually pleasing at it deserves to be.
 
+# DONE: Blocks right under each other of same key but different 
+#       nest depth will no longer be aligned.
+# DONE: Reworked the key_by() function.
+
 # TODO: Make the keywords assignable by the user, so that they can use
 #       this script on any type of text file.
-
-# BUG: Assignment operators of different nest length will line up.
 
 # BUG FORESEEN: Comments are going to fuck things up.
 # BUG FORESEEN: Alignments throwing lines over the char limit.
@@ -27,19 +29,38 @@ def get_lines(filename):
     return contents
 
 def fix_by(key, lines):
-    '''Scans a file, straightening any block of lines that contain the key.'''
+    '''Scans a file, straightening any block of lines that contains the key.'''
     block = []
+    nest  = None  # This will become an int below before it is ever used.
     for pos, line in enumerate(lines):
-        if key in line:  # Start of a block.
-            block.append((pos, line))
-        elif block:
-            if len(block) > 1:
+        if block:  # We are mid-way through a block already.
+            if key in line and nest_match(nest, line):
+                block.append((pos, line))
+            else:  # Block over. Process it.
                 lines = process_block(key, block, lines)
-            block     = []  # Reset the block of lines.
-    if block and len(block) > 1:
+                block = []
+        # This should not be an 'elif'. 
+        # Blocks of different nest depth can be right under each other.
+        if not block and key in line:  # We found the start of a new block.
+            if not line.lstrip().startswith(key.lstrip()):
+                # If the key is the first non-whitespace char in the line,
+                # then IT defines the nest depth! No correction will be made.
+                block.append((pos, line))  # Fire it in.
+                nest = get_nest(line)      # Set the nest limit.
+    if block:
         lines = process_block(key, block, lines)  # Catch stragglers.
     return lines
 
+def nest_match(nest, line):
+    '''True if the first non-white space char of line is at index 'nest'.'''
+    if get_nest(line) == nest:
+        return True
+    return False
+
+def get_nest(line):
+    '''Calculates how nested the given line is.'''
+    return len(line) - len(line.lstrip())
+            
 def process_block(key, block, lines):
     '''Handles the process of a block of lines.'''
     block = align_by_key(key, block)    # Edit lines to align by key.
@@ -54,16 +75,16 @@ def align_by_key(key, block):
     firsts      = list(map(lambda tokens: tokens[0].rstrip(), line_tokens))
     # Is there a way to do a Haskell-like 'let' in a Python lambda?
     longest = _reduce(lambda ac, i: len(i) if len(i) > ac else ac, firsts, 0)
-    for pos, line in enumerate(line_tokens):
+    for pos, line in enumerate(line_tokens):  # Perform alignment.
         start            = firsts[pos] + (' ' * (longest - len(firsts[pos])))
         line_tokens[pos] = ''.join((start, key, line[1].lstrip()))
-    for pos, line in enumerate(block):
+    for pos, line in enumerate(block):  # Repair 'block'.
         block[pos] = (block[pos][0], line_tokens[pos])
     return block
 
 def replace_lines(block, lines):
     '''Given a block and lines, replaces the master lines in 'lines' with
-    the ones fixed in 'block.
+    the ones fixed in 'block'.
     '''
     for pos, line in block:
         lines[pos] = line
