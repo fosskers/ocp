@@ -2,15 +2,7 @@
 # author:  Colin Woodbury
 # contact: colingw AT gmail
 # about:   Obsessive Compulsive Python
-#          Does code not lined up all pretty-like bother you?
-#          Does your Haskell experience make you want to line up all your
-#          assignment operators? If so, you've come to the right script.
-#          ocp will line up all your code where possible with the goal
-#          to make your code as visually pleasing at it deserves to be.
-
-# DONE: Blocks right under each other of same key but different 
-#       nest depth will no longer be aligned.
-# DONE: Reworked the key_by() function.
+#          Beautifies your code!
 
 # TODO: Make the keywords assignable by the user, so that they can use
 #       this script on any type of text file.
@@ -78,7 +70,7 @@ def align_by_key(key, block):
     for pos, line in enumerate(line_tokens):  # Perform alignment.
         start            = firsts[pos] + (' ' * (longest - len(firsts[pos])))
         line_tokens[pos] = ''.join((start, key, line[1].lstrip()))
-    for pos, line in enumerate(block):  # Repair 'block'.
+    for pos in range(len(block)):  # Repair 'block'.
         block[pos] = (block[pos][0], line_tokens[pos])
     return block
 

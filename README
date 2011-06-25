@@ -1,0 +1,33 @@
+ocp - Obsessive Compulsive Python
+---------------------------------
+
+Does code not lined up all pretty-like bother you?
+Does your Haskell experience make you want to line up all your
+assignment operators? Is so, then ocp is for you.
+ocp will line up all your code when possible with the goal
+of making your code as visually pleasing as it deserves to be.
+
+INSTALLING OCP
+--------------
+Add the following to your .bashrc file:
+  alias ocp='python3 /path/to/ocp/ocp.py'
+
+RUNNING OCP
+-----------
+After installing ocp and restarting your terminal, running:
+  ocp some-source.py
+
+will beautify your code, and save it in a copy file labeled like:
+  ocp-some-source.py 
+
+Make sure to review the prettified code before you accept it as your
+master copy!
+
+EXTENDING OCP
+-------------
+The global variable 'keyword' stores the keys by which code is lined up.
+By changing the values in keywords, you can change what keys will
+determine how your code is aligned. 
+Later, this will become a standard feature so delving into the source
+code will not be necessary. By doing this, ocp will be usable for much
+more than just aligning code.
