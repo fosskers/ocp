@@ -23,11 +23,16 @@ will beautify your code, and save it in a copy file labeled like:
 Make sure to review the prettified code before you accept it as your
 master copy!
 
-EXTENDING OCP
--------------
-The global variable 'keyword' stores the keys by which code is lined up.
-By changing the values in keywords, you can change what keys will
-determine how your code is aligned. 
-Later, this will become a standard feature so delving into the source
-code will not be necessary. By doing this, ocp will be usable for much
-more than just aligning code.
+ALIGNING BY USER-INDICATED SYMBOLS
+----------------------------------
+The default symbols by which ocp aligns are:
+  import as = #
+which are all prime offenders in misaligned code.
+By adding extra commandline args, like so:
+  ocp some-source.py = == +=
+the default symbols will be overwritten and the code will be aligned
+by the ones indicated only.
+For symbols that would otherwise have meaning in a bash shell,
+please put the symbols in quotes, as follows:
+  ocp some-haskell-source.hs "<-" "|"
+

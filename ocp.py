@@ -4,9 +4,6 @@
 # about:   Obsessive Compulsive Python
 #          Beautifies your code!
 
-# TODO: Make the keywords assignable by the user, so that they can use
-#       this script on any type of text file.
-
 # BUG FORESEEN: Comments are going to fuck things up.
 # BUG FORESEEN: Alignments throwing lines over the char limit.
 
@@ -29,7 +26,8 @@ def fix_by(key, lines):
             if key in line and nest_match(nest, line):
                 block.append((pos, line))
             else:  # Block over. Process it.
-                lines = process_block(key, block, lines)
+                if len(block) > 1:  # No point in processing a single line.
+                    lines = process_block(key, block, lines)
                 block = []
         # This should not be an 'elif'. 
         # Blocks of different nest depth can be right under each other.
@@ -45,9 +43,7 @@ def fix_by(key, lines):
 
 def nest_match(nest, line):
     '''True if the first non-white space char of line is at index 'nest'.'''
-    if get_nest(line) == nest:
-        return True
-    return False
+    return True if get_nest(line) == nest else False
 
 def get_nest(line):
     '''Calculates how nested the given line is.'''
@@ -78,8 +74,10 @@ def replace_lines(block, lines):
     '''Given a block and lines, replaces the master lines in 'lines' with
     the ones fixed in 'block'.
     '''
+    global altered
     for pos, line in block:
         lines[pos] = line
+        altered += 1
     return lines
         
 def write_changes(filename, lines):
@@ -89,13 +87,17 @@ def write_changes(filename, lines):
             output.write(line)
 
 keywords = (' import ', ' as ', ' = ', '  # ')  # Add more later.
+altered  = 0  # The number of lines altered.
 
 if __name__ == '__main__':
-    filename = _get_args()
-    if filename:
-        lines = get_lines(filename[0])
+    args = _get_args('AT_LEAST', 0)
+    if args:
+        if len(args) > 1:  # Assume user has given keys to align by.
+            keywords = map(lambda arg: ' ' + arg + ' ', args[1:])  # Pad args!
+        lines = get_lines(args[0])
         for key in keywords:
             lines = fix_by(key, lines)
-        write_changes(filename[0], lines)
+        write_changes(args[0], lines)
         print('Prettification Complete.')
+        print('{} lines altered.'.format(altered))
 
